@@ -100,39 +100,26 @@ static int addNode(LinkedList* this, int nodeIndex, void* pElement)
         returnAux = 0;
 
         Node* nuevoNodo = (Node*) malloc(sizeof(Node));
-        Node* pElementoAnterior = this->pFirstNode;
+        Node* pElementoAnterior = NULL;
         Node* pElementoPosterior = NULL;
 
-        nuevoNodo->pElement = pElement;
-
-        if(pElementoAnterior == NULL) //En el caso de que sea una lista vacia
+        if(nodeIndex == 0)
         {
-            this->pFirstNode = nuevoNodo;
-            nuevoNodo->pNextNode = NULL;
-        }
-        else //No es una lista vacia
-        {
-            if(nodeIndex == 0)
-            {
-                pElementoPosterior = this->pFirstNode;
-                this->pFirstNode = nuevoNodo;
-                nuevoNodo->pNextNode = pElementoPosterior;
-            }
-            else
-            {
-                int i;
-                for(i = 1; i < nodeIndex; i++)
-                {
-                    pElementoAnterior = pElementoAnterior->pNextNode;
-                }
-
-                pElementoPosterior = pElementoAnterior->pNextNode;
-            }
-            pElementoAnterior->pNextNode = nuevoNodo;
+            pElementoPosterior = getNode(this, nodeIndex);
             nuevoNodo->pNextNode = pElementoPosterior;
+            this->pFirstNode = nuevoNodo;
         }
-    }
+        else
+        {
+            pElementoPosterior = getNode(this, nodeIndex);
+            nuevoNodo->pNextNode = pElementoPosterior;
+            pElementoAnterior = getNode(this, nodeIndex-1);
+            pElementoAnterior->pNextNode = nuevoNodo;
+        }
 
+        nuevoNodo->pElement = pElement;
+        this->size = this->size + 1;
+    }
     return returnAux;
 }
 
@@ -162,14 +149,23 @@ int test_addNode(LinkedList* this, int nodeIndex,void* pElement)
 int ll_add(LinkedList* this, void* pElement)
 {
     int returnAux = -1;
+    if(this != NULL)
+    {
+       int len;
+       len = ll_len(this);
 
+       if(addNode(this, len, pElement) == 0)
+       {
+           returnAux = 0;
+       }
+    }
     return returnAux;
 }
 
-/** \brief Permite realizar el test de la funcion addNode la cual es privada
+/** \brief Permite obtener un nodo en un índice especificado
  *
  * \param this LinkedList* Puntero a la lista
- * \param nodeIndex int Ubicacion del elemento a obtener
+ * \param index int Ubicacion del elemento a obtener
  * \return void* Retorna    (NULL) Error: si el puntero a la lista es NULL o (si el indice es menor a 0 o mayor al len de la lista)
                             (pElement) Si funciono correctamente
  *
@@ -177,7 +173,11 @@ int ll_add(LinkedList* this, void* pElement)
 void* ll_get(LinkedList* this, int index)
 {
     void* returnAux = NULL;
-
+    if(this != NULL && index >= 0 && index < ll_len(this))
+    {
+        Node* nodo = getNode(this, index);
+        returnAux = nodo->pElement;
+    }
     return returnAux;
 }
 
